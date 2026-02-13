@@ -57,11 +57,20 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Fuzz automaton
-        run: go test -fuzz=Fuzz -fuzztime=30s ./internal/automaton/...
+      - name: Fuzz wildcard automaton
+        run: go test -fuzz=FuzzWildcardAutomaton -fuzztime=30s ./internal/automaton/
 
-      - name: Fuzz analysis
-        run: go test -fuzz=Fuzz -fuzztime=30s ./internal/analysis/...
+      - name: Fuzz levenshtein automaton
+        run: go test -fuzz=FuzzLevenshteinAutomaton -fuzztime=30s ./internal/automaton/
+
+      - name: Fuzz prefix automaton
+        run: go test -fuzz=FuzzPrefixAutomaton -fuzztime=30s ./internal/automaton/
+
+      - name: Fuzz standard analyzer
+        run: go test -fuzz=FuzzStandardAnalyzer -fuzztime=30s ./internal/analysis/
+
+      - name: Fuzz whitespace analyzer
+        run: go test -fuzz=FuzzWhitespaceAnalyzer -fuzztime=30s ./internal/analysis/
 
   build:
     needs: test
