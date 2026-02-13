@@ -243,8 +243,22 @@ func TestLevenshteinAutomaton_MaxDistanceExceeded(t *testing.T) {
 	}
 }
 
+func TestLevenshteinAutomaton_MinTermLength(t *testing.T) {
+	// Short term with distance > 0 should fail.
+	_, err := NewLevenshteinAutomaton([]byte("ab"), 1)
+	if err != ErrTermTooShort {
+		t.Errorf("expected ErrTermTooShort, got %v", err)
+	}
+
+	// Short term with distance 0 should succeed (exact match).
+	_, err = NewLevenshteinAutomaton([]byte("ab"), 0)
+	if err != nil {
+		t.Errorf("distance 0 with short term should succeed, got %v", err)
+	}
+}
+
 func TestLevenshteinAutomaton_CanMatch(t *testing.T) {
-	a, err := NewLevenshteinAutomaton([]byte("ab"), 1)
+	a, err := NewLevenshteinAutomaton([]byte("abc"), 1)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -3,7 +3,10 @@ package automaton
 import "errors"
 
 // Levenshtein automaton limits.
-const MaxEditDistance = 2
+const (
+	MaxEditDistance    = 2
+	MinFuzzyTermLength = 3
+)
 
 var (
 	ErrEditDistanceTooLarge = errors.New("edit distance exceeds maximum of 2")
@@ -29,6 +32,9 @@ func NewLevenshteinAutomaton(target []byte, maxDist int) (*LevenshteinAutomaton,
 	}
 	if maxDist < 0 {
 		return nil, ErrEditDistanceTooLarge
+	}
+	if maxDist > 0 && len(target) < MinFuzzyTermLength {
+		return nil, ErrTermTooShort
 	}
 	return &LevenshteinAutomaton{
 		target:  target,

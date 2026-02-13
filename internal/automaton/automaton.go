@@ -6,6 +6,14 @@ type State uint32
 // DeadState is the sink state from which no accepting state is reachable.
 const DeadState State = 0
 
+// Compilation limits.
+const (
+	MaxNFAStates        = 1_000  // Bound regex complexity.
+	MaxDFAStates        = 10_000 // Bound subset construction.
+	MaxTermExpansion    = 1_000  // Max terms from automaton-FST intersection.
+	MaxStatesVisited    = 10_000 // Max automaton states visited during intersection.
+)
+
 // Automaton is the core interface for all DFA-based query expansion.
 // All non-trivial term expansion (prefix, wildcard, regex, fuzzy) MUST be
 // executed as Automaton ∩ FST intersection.

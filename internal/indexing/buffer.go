@@ -42,6 +42,9 @@ type WriteBuffer struct {
 	// externalToInternal maps external doc IDs to internal doc IDs.
 	ExternalToInternal map[string]uint32
 
+	// Deletions tracks external IDs marked for deletion.
+	Deletions map[string]bool
+
 	NextDocID uint32
 	DocCount  int
 	TermCount int
@@ -57,6 +60,7 @@ func NewWriteBuffer() *WriteBuffer {
 		InvertedIndex:      make(map[string]map[string]*PostingsList),
 		StoredFields:       make(map[uint32]map[string][]byte),
 		ExternalToInternal: make(map[string]uint32),
+		Deletions:          make(map[string]bool),
 		MemoryLimit:        DefaultBufferMemoryLimit,
 		MaxDocs:            DefaultMaxDocsPerSegment,
 	}
@@ -128,11 +132,17 @@ func (b *WriteBuffer) IsFull() bool {
 	return false
 }
 
+// MarkDeleted records an external ID for deletion at commit time.
+func (b *WriteBuffer) MarkDeleted(externalID string) {
+	b.Deletions[externalID] = true
+}
+
 // Reset clears the buffer for reuse.
 func (b *WriteBuffer) Reset() {
 	b.InvertedIndex = make(map[string]map[string]*PostingsList)
 	b.StoredFields = make(map[uint32]map[string][]byte)
 	b.ExternalToInternal = make(map[string]uint32)
+	b.Deletions = make(map[string]bool)
 	b.NextDocID = 0
 	b.DocCount = 0
 	b.TermCount = 0

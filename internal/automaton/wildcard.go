@@ -5,7 +5,10 @@ import "errors"
 // Wildcard pattern limits.
 const MaxWildcardPatternLength = 256
 
-var ErrWildcardPatternTooLong = errors.New("wildcard pattern exceeds maximum length")
+var (
+	ErrWildcardPatternTooLong = errors.New("wildcard pattern exceeds maximum length")
+	ErrDFAStateLimitExceeded  = errors.New("DFA state limit exceeded during construction")
+)
 
 // WildcardAutomaton accepts strings matching a wildcard pattern.
 // Supports '*' (zero or more characters) and '?' (exactly one character).
@@ -25,7 +28,7 @@ func NewWildcardAutomaton(pattern []byte) (*WildcardAutomaton, error) {
 
 	// Build NFA then convert to DFA via subset construction.
 	nfa := buildWildcardNFA(pattern)
-	return subsetConstruct(nfa), nil
+	return subsetConstruct(nfa)
 }
 
 func (a *WildcardAutomaton) Start() State {
@@ -105,7 +108,8 @@ func buildWildcardNFA(pattern []byte) *nfa {
 }
 
 // subsetConstruct converts an NFA to a DFA using the subset construction algorithm.
-func subsetConstruct(n *nfa) *WildcardAutomaton {
+// Returns an error if the DFA exceeds MaxDFAStates.
+func subsetConstruct(n *nfa) (*WildcardAutomaton, error) {
 	type stateSet map[int]bool
 
 	epsilonClosure := func(states stateSet) stateSet {
@@ -188,6 +192,9 @@ func subsetConstruct(n *nfa) *WildcardAutomaton {
 				dfa.transitions[currentID][b] = id
 			} else {
 				newID := State(len(dfa.transitions))
+				if int(newID) >= MaxDFAStates {
+					return nil, ErrDFAStateLimitExceeded
+				}
 				setToID[key] = newID
 				dfa.transitions = append(dfa.transitions, make([]State, 256))
 				dfa.accepting = append(dfa.accepting, isAccepting(nextSet))
@@ -198,5 +205,5 @@ func subsetConstruct(n *nfa) *WildcardAutomaton {
 		}
 	}
 
-	return dfa
+	return dfa, nil
 }

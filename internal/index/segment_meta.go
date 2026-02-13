@@ -40,10 +40,12 @@ type SegmentInfo struct {
 
 // FieldStats contains per-field statistics for a segment.
 type FieldStats struct {
-	TermCount    uint64 `json:"term_count"`
+	TermCount     uint64 `json:"term_count"`
 	TotalTermFreq uint64 `json:"total_term_freq"`
-	DocCount     uint32 `json:"doc_count"`
-	SumDocFreq   uint64 `json:"sum_doc_freq"`
+	DocCount      uint32 `json:"doc_count"`
+	SumDocFreq    uint64 `json:"sum_doc_freq"`
+	MinTermLength uint32 `json:"min_term_length,omitempty"`
+	MaxTermLength uint32 `json:"max_term_length,omitempty"`
 }
 
 // MarshalSegmentInfo serializes segment info to JSON with a checksum.

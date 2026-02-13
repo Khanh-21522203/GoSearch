@@ -3,6 +3,7 @@ package indexing
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"sync"
 
 	"GoSearch/internal/analysis"
@@ -91,6 +92,40 @@ func (w *Writer) AddDocument(doc Document) error {
 	}
 
 	return nil
+}
+
+// AddDocuments validates and indexes multiple documents into the write buffer.
+func (w *Writer) AddDocuments(docs []Document) error {
+	for i, doc := range docs {
+		if err := w.AddDocument(doc); err != nil {
+			return fmt.Errorf("document %d: %w", i, err)
+		}
+	}
+	return nil
+}
+
+// DeleteDocument marks a document for deletion by external ID.
+// The deletion is recorded in the write buffer and applied at commit time.
+func (w *Writer) DeleteDocument(externalID string) error {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	if !w.active {
+		return ErrWriterNotActive
+	}
+
+	w.buffer.MarkDeleted(externalID)
+	return nil
+}
+
+// DocCount returns the number of documents currently in the write buffer.
+func (w *Writer) DocCount() int {
+	return w.buffer.DocCount
+}
+
+// IsFull returns true if the write buffer has reached its memory or document limit.
+func (w *Writer) IsFull() bool {
+	return w.buffer.IsFull()
 }
 
 // Buffer returns the current write buffer (for segment building).
