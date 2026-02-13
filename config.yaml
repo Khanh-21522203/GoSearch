@@ -1,0 +1,36 @@
+server:
+  host: 0.0.0.0
+  port: 8080
+  read_timeout: 30s
+  write_timeout: 60s
+  max_request_size: 100MB
+
+storage:
+  data_dir: /data
+  max_index_size: 0  # unlimited
+  fsync_on_commit: true
+
+indexing:
+  buffer_size: 64MB
+  max_docs_per_segment: 100000
+  merge_policy:
+    max_segments: 10
+    min_merge_size: 10MB
+
+query:
+  default_timeout: 30s
+  max_results: 10000
+  max_boolean_clauses: 1024
+  automaton_limits:
+    max_states: 10000
+    max_terms: 1000
+
+logging:
+  level: info
+  format: json
+  output: stdout
+
+metrics:
+  enabled: true
+  port: 9090
+  path: /metrics

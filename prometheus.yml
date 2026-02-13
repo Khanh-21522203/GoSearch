@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'gotextsearch'
+    static_configs:
+      - targets: ['gotextsearch:9090']
+    metrics_path: /metrics

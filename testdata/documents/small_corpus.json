@@ -1,0 +1,12 @@
+[
+  {"id": "1", "title": "Introduction to Search Engines", "body": "Full-text search is a technique for searching documents stored in a database.", "tags": ["search", "tutorial"]},
+  {"id": "2", "title": "Advanced Query Processing", "body": "Boolean queries combine multiple search terms using AND OR operators for complex retrieval.", "tags": ["search", "advanced"]},
+  {"id": "3", "title": "Building an Inverted Index", "body": "An inverted index maps terms to the documents containing them for fast lookup.", "tags": ["indexing", "tutorial"]},
+  {"id": "4", "title": "BM25 Scoring Algorithm", "body": "BM25 is a ranking function used by search engines to estimate the relevance of documents.", "tags": ["scoring", "algorithm"]},
+  {"id": "5", "title": "Fuzzy Search with Levenshtein Automata", "body": "Fuzzy search finds terms within an edit distance of the query term using automata.", "tags": ["search", "fuzzy"]},
+  {"id": "6", "title": "Phrase Queries and Position Indexes", "body": "Phrase queries require position information to verify that terms appear in sequence.", "tags": ["search", "phrase"]},
+  {"id": "7", "title": "Wildcard Queries with Finite Automata", "body": "Wildcard patterns are compiled into deterministic finite automata for efficient matching.", "tags": ["search", "wildcard"]},
+  {"id": "8", "title": "Segment Merging Strategies", "body": "Segment merging reduces the number of segments to improve query performance.", "tags": ["indexing", "performance"]},
+  {"id": "9", "title": "Crash Recovery in Search Systems", "body": "Write-ahead logging and atomic operations ensure data integrity after crashes.", "tags": ["reliability", "recovery"]},
+  {"id": "10", "title": "Distributed Search Architecture", "body": "Sharding distributes index data across multiple nodes for horizontal scaling.", "tags": ["architecture", "distributed"]}
+]
