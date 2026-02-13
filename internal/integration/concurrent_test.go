@@ -24,7 +24,7 @@ func TestConcurrentReaders(t *testing.T) {
 				errors <- err
 				return
 			}
-			defer snap.Release()
+			defer func() { _ = snap.Release() }()
 
 			// Simulate query work.
 			if snap.Generation != 1 {
@@ -71,7 +71,7 @@ func TestConcurrentReadersWithCommit(t *testing.T) {
 				return
 			}
 			time.Sleep(time.Millisecond)
-			snap.Release()
+			_ = snap.Release()
 		}()
 	}
 
@@ -98,9 +98,13 @@ func TestConcurrentReadersWithCommit(t *testing.T) {
 	if len(reader2.Segments) != 2 {
 		t.Errorf("reader2 segments = %d, want 2", len(reader2.Segments))
 	}
-	reader2.Release()
+	if err := reader2.Release(); err != nil {
+		t.Fatal(err)
+	}
 
-	reader1.Release()
+	if err := reader1.Release(); err != nil {
+		t.Fatal(err)
+	}
 	wg.Wait()
 
 	if m.ActiveSnapshotCount() != 0 {
@@ -141,7 +145,7 @@ func TestConcurrentReadersWithMerge(t *testing.T) {
 
 	// Release all.
 	for _, snap := range snaps {
-		snap.Release()
+		_ = snap.Release()
 	}
 
 	if m.ActiveSnapshotCount() != 0 {

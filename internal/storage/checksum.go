@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"hash"
 	"io"
 	"os"
 	"strings"
@@ -79,11 +78,6 @@ func VerifyFileChecksum(path string, expected Checksum) error {
 		return fmt.Errorf("%w: file %s expected %s got %s", ErrChecksumMismatch, path, expected, actual)
 	}
 	return nil
-}
-
-// NewHasher returns a new SHA-256 hash.Hash.
-func NewHasher() hash.Hash {
-	return sha256.New()
 }
 
 // FormatChecksum formats raw hash bytes into a Checksum with the "sha256:" prefix.

@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"GoSearch/internal/server"
 )
 
 // Version is set at build time via -ldflags.
@@ -23,7 +25,7 @@ func main() {
 	slog.SetDefault(logger)
 
 	port := getEnv("GOTEXTSEARCH_PORT", "8080")
-	dataDir := getEnv("GOTEXTSEARCH_DATA_DIR", "/data")
+	dataDir := getEnv("GOTEXTSEARCH_DATA_DIR", "data")
 
 	logger.Info("starting GoSearch",
 		"version", Version,
@@ -32,12 +34,22 @@ func main() {
 		"config", *configPath,
 	)
 
+	// Initialize index manager (loads existing indexes, runs recovery).
+	mgr, err := server.NewIndexManager(dataDir, logger)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to initialize index manager: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Create HTTP handler and register API routes.
+	handler := server.NewHandler(mgr, logger)
 	mux := http.NewServeMux()
+	handler.RegisterRoutes(mux)
 
 	// Health check endpoint.
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		_ = json.NewEncoder(w).Encode(map[string]string{
 			"status":  "healthy",
 			"version": Version,
 		})
@@ -46,7 +58,7 @@ func main() {
 	// Readiness probe.
 	mux.HandleFunc("GET /ready", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		_ = json.NewEncoder(w).Encode(map[string]string{
 			"status": "ready",
 		})
 	})
@@ -58,13 +70,13 @@ func main() {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		_ = json.NewEncoder(w).Encode(map[string]string{
 			"name":    "GoSearch",
 			"version": Version,
 		})
 	})
 
-	server := &http.Server{
+	srv := &http.Server{
 		Addr:         ":" + port,
 		Handler:      mux,
 		ReadTimeout:  30 * time.Second,
@@ -72,8 +84,8 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	logger.Info("listening", "addr", server.Addr)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	logger.Info("listening", "addr", srv.Addr)
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		fmt.Fprintf(os.Stderr, "server error: %v\n", err)
 		os.Exit(1)
 	}

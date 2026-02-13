@@ -92,12 +92,16 @@ func TestWriteBuffer_IsFull_DocLimit(t *testing.T) {
 	buf := NewWriteBuffer()
 	buf.MaxDocs = 2
 
-	buf.AllocateDocID("doc-1")
+	if _, err := buf.AllocateDocID("doc-1"); err != nil {
+		t.Fatal(err)
+	}
 	if buf.IsFull() {
 		t.Error("should not be full with 1 doc")
 	}
 
-	buf.AllocateDocID("doc-2")
+	if _, err := buf.AllocateDocID("doc-2"); err != nil {
+		t.Fatal(err)
+	}
 	if !buf.IsFull() {
 		t.Error("should be full with 2 docs")
 	}
@@ -105,7 +109,9 @@ func TestWriteBuffer_IsFull_DocLimit(t *testing.T) {
 
 func TestWriteBuffer_Reset(t *testing.T) {
 	buf := NewWriteBuffer()
-	buf.AllocateDocID("doc-1")
+	if _, err := buf.AllocateDocID("doc-1"); err != nil {
+		t.Fatal(err)
+	}
 	buf.AddPosting("title", "hello", 0, 1, nil)
 	buf.StoreField(0, "title", []byte("test"))
 
@@ -258,7 +264,7 @@ func TestWriter_Abort(t *testing.T) {
 			"title": "Test",
 		},
 	}
-	w.AddDocument(doc)
+	_ = w.AddDocument(doc)
 	w.Abort()
 
 	if w.Buffer().DocCount != 0 {

@@ -162,12 +162,16 @@ func TestE2E_MultipleIndexes(t *testing.T) {
 	w2 := indexing.NewWriter(schema, registry)
 
 	// Index different docs in each.
-	w1.AddDocument(indexing.Document{Fields: map[string]interface{}{
+	if err := w1.AddDocument(indexing.Document{Fields: map[string]interface{}{
 		"id": "a1", "title": "Alpha Document",
-	}})
-	w2.AddDocument(indexing.Document{Fields: map[string]interface{}{
+	}}); err != nil {
+		t.Fatal(err)
+	}
+	if err := w2.AddDocument(indexing.Document{Fields: map[string]interface{}{
 		"id": "b1", "title": "Beta Document",
-	}})
+	}}); err != nil {
+		t.Fatal(err)
+	}
 
 	// Verify isolation.
 	if w1.Buffer().DocCount != 1 {
@@ -199,11 +203,13 @@ func TestE2E_StoredFieldRetrieval(t *testing.T) {
 	registry := analysis.NewRegistry()
 	w := indexing.NewWriter(schema, registry)
 
-	w.AddDocument(indexing.Document{Fields: map[string]interface{}{
+	if err := w.AddDocument(indexing.Document{Fields: map[string]interface{}{
 		"id":       "doc-1",
 		"title":    "Test Document",
 		"metadata": "some raw data",
-	}})
+	}}); err != nil {
+		t.Fatal(err)
+	}
 
 	buf := w.Buffer()
 

@@ -48,7 +48,9 @@ func TestManager_AcquireRelease_EmptyIndex(t *testing.T) {
 		t.Errorf("active snapshots = %d, want 1", m.ActiveSnapshotCount())
 	}
 
-	snap.Release()
+	if err := snap.Release(); err != nil {
+		t.Fatal(err)
+	}
 	if m.ActiveSnapshotCount() != 0 {
 		t.Errorf("active snapshots after release = %d, want 0", m.ActiveSnapshotCount())
 	}
@@ -75,7 +77,9 @@ func TestManager_AcquireRelease_WithSegments(t *testing.T) {
 		}
 	}
 
-	snap.Release()
+	if err := snap.Release(); err != nil {
+		t.Fatal(err)
+	}
 
 	// Segments should be unpinned.
 	if rc := m.SegmentRefCount("seg_a"); rc != 0 {
@@ -96,7 +100,9 @@ func TestManager_MultipleSnapshots(t *testing.T) {
 		t.Errorf("seg_a refcount = %d, want 2", rc)
 	}
 
-	s1.Release()
+	if err := s1.Release(); err != nil {
+		t.Fatal(err)
+	}
 	if m.ActiveSnapshotCount() != 1 {
 		t.Errorf("active snapshots = %d, want 1", m.ActiveSnapshotCount())
 	}
@@ -104,7 +110,9 @@ func TestManager_MultipleSnapshots(t *testing.T) {
 		t.Errorf("seg_a refcount = %d, want 1", rc)
 	}
 
-	s2.Release()
+	if err := s2.Release(); err != nil {
+		t.Fatal(err)
+	}
 	if m.ActiveSnapshotCount() != 0 {
 		t.Errorf("active snapshots = %d, want 0", m.ActiveSnapshotCount())
 	}
@@ -114,8 +122,8 @@ func TestManager_DoubleRelease(t *testing.T) {
 	m := NewManager(1, []string{"seg_a"}, nil)
 
 	snap, _ := m.Acquire()
-	snap.Release()
-	snap.Release() // Should be a no-op, not panic.
+	_ = snap.Release()
+	_ = snap.Release() // Should be a no-op, not panic.
 
 	if rc := m.SegmentRefCount("seg_a"); rc != 0 {
 		t.Errorf("seg_a refcount = %d, want 0", rc)
@@ -162,7 +170,9 @@ func TestManager_UpdateGeneration_PinnedSegmentNotReclaimable(t *testing.T) {
 	}
 
 	// After release, they become reclaimable (but we'd need to check again).
-	snap.Release()
+	if err := snap.Release(); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestManager_UpdateGeneration_PanicsOnNonMonotonic(t *testing.T) {
@@ -206,8 +216,12 @@ func TestManager_CommitDuringActiveRead(t *testing.T) {
 		t.Errorf("reader1 segments = %d, want 2", len(reader1.Segments))
 	}
 
-	reader1.Release()
-	reader2.Release()
+	if err := reader1.Release(); err != nil {
+		t.Fatal(err)
+	}
+	if err := reader2.Release(); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestManager_MergeDuringActiveRead(t *testing.T) {
@@ -225,7 +239,9 @@ func TestManager_MergeDuringActiveRead(t *testing.T) {
 	}
 
 	// Reader releases.
-	reader.Release()
+	if err := reader.Release(); err != nil {
+		t.Fatal(err)
+	}
 
 	// Now seg_a and seg_b should have refcount 0.
 	// (They are tracked in the old currentSegments, not the new one,
@@ -248,7 +264,7 @@ func TestManager_ConcurrentAcquireRelease(t *testing.T) {
 			}
 			// Simulate some work.
 			time.Sleep(time.Microsecond)
-			snap.Release()
+			_ = snap.Release()
 		}()
 	}
 	wg.Wait()
@@ -273,7 +289,9 @@ func TestManager_DetectLeaks(t *testing.T) {
 		t.Errorf("leaks = %d, want 1", len(leaks))
 	}
 
-	snap.Release()
+	if err := snap.Release(); err != nil {
+		t.Fatal(err)
+	}
 
 	leaks = m.DetectLeaks()
 	if len(leaks) != 0 {
@@ -286,7 +304,7 @@ func TestManager_DetectLeaks_Disabled(t *testing.T) {
 	m.LeakThreshold = 0
 
 	snap, _ := m.Acquire()
-	defer snap.Release()
+	defer func() { _ = snap.Release() }()
 
 	leaks := m.DetectLeaks()
 	if len(leaks) != 0 {
@@ -302,7 +320,7 @@ func TestSnapshot_Released(t *testing.T) {
 		t.Error("should not be released yet")
 	}
 
-	snap.Release()
+	_ = snap.Release()
 	if !snap.Released() {
 		t.Error("should be released")
 	}
@@ -318,5 +336,5 @@ func TestSnapshot_HeldDuration(t *testing.T) {
 		t.Errorf("held duration = %v, expected >= 1ms", d)
 	}
 
-	snap.Release()
+	_ = snap.Release()
 }

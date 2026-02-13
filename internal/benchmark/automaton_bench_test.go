@@ -39,7 +39,7 @@ func BenchmarkAutomaton_Wildcard_Simple(b *testing.B) {
 	pattern := []byte("hel*")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		automaton.NewWildcardAutomaton(pattern)
+		_, _ = automaton.NewWildcardAutomaton(pattern)
 	}
 }
 
@@ -47,7 +47,7 @@ func BenchmarkAutomaton_Wildcard_Complex(b *testing.B) {
 	pattern := []byte("*ell*")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		automaton.NewWildcardAutomaton(pattern)
+		_, _ = automaton.NewWildcardAutomaton(pattern)
 	}
 }
 
@@ -68,7 +68,7 @@ func BenchmarkAutomaton_Levenshtein_Dist1(b *testing.B) {
 	target := []byte("hello")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		automaton.NewLevenshteinAutomaton(target, 1)
+		_, _ = automaton.NewLevenshteinAutomaton(target, 1)
 	}
 }
 
@@ -76,7 +76,7 @@ func BenchmarkAutomaton_Levenshtein_Dist2(b *testing.B) {
 	target := []byte("hello")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		automaton.NewLevenshteinAutomaton(target, 2)
+		_, _ = automaton.NewLevenshteinAutomaton(target, 2)
 	}
 }
 

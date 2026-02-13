@@ -293,7 +293,9 @@ func TestLoadManifest_CorruptChecksum(t *testing.T) {
 			break
 		}
 	}
-	os.WriteFile(path, tampered, 0644)
+	if err := os.WriteFile(path, tampered, 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	_, err := LoadManifest(dir, 1)
 	if err == nil {

@@ -68,9 +68,8 @@ func TestSlicePostingsIterator_Freq(t *testing.T) {
 
 func TestSlicePostingsIterator_Cost(t *testing.T) {
 	it := NewSlicePostingsIterator([]uint32{1, 2, 3, 4, 5}, nil)
-	if it.Cost() != 4 { // pos=-1, remaining=5-(-1)-1=5... actually 5 total
-		// Before any Next(), pos=-1, remaining = 5 - (-1) - 1 = 5
-	}
+	// Before any Next(), cost reflects total docs.
+	_ = it.Cost()
 	it.Next()
 	if it.Cost() != 4 {
 		t.Errorf("Cost = %d, want 4", it.Cost())

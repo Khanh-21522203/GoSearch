@@ -8,7 +8,6 @@ type ConjunctionIterator struct {
 	children []PostingsIterator
 	lead     PostingsIterator
 	current  uint32
-	started  bool
 }
 
 // NewConjunctionIterator creates an AND iterator over the given children.

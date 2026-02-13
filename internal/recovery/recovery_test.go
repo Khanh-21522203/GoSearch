@@ -106,8 +106,12 @@ func TestRecover_TmpCleanup(t *testing.T) {
 	doCommit(t, dir, nil)
 
 	// Leave junk in tmp/.
-	os.WriteFile(filepath.Join(dir.TmpDir(), "orphan.tmp"), []byte("junk"), 0644)
-	os.MkdirAll(filepath.Join(dir.TmpDir(), "leftover_dir"), 0755)
+	if err := os.WriteFile(filepath.Join(dir.TmpDir(), "orphan.tmp"), []byte("junk"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(dir.TmpDir(), "leftover_dir"), 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := Recover(dir, DefaultOptions())
 	if err != nil {
@@ -130,8 +134,12 @@ func TestRecover_OrphanSegmentCleanup(t *testing.T) {
 
 	// Create an orphan segment directory.
 	orphanDir := dir.SegmentDir("seg_gen_99_deadbeef")
-	os.MkdirAll(orphanDir, 0755)
-	os.WriteFile(filepath.Join(orphanDir, "fst.bin"), []byte("orphan"), 0644)
+	if err := os.MkdirAll(orphanDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(orphanDir, "fst.bin"), []byte("orphan"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := Recover(dir, DefaultOptions())
 	if err != nil {
@@ -162,7 +170,9 @@ func TestRecover_CorruptManifestFallback(t *testing.T) {
 
 	// Corrupt manifest gen 2.
 	path := dir.ManifestPath(2)
-	os.WriteFile(path, []byte(`{"corrupt":true}`), 0644)
+	if err := os.WriteFile(path, []byte(`{"corrupt":true}`), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := Recover(dir, DefaultOptions())
 	if err != nil {
@@ -191,7 +201,9 @@ func TestRecover_CorruptSegmentFallback(t *testing.T) {
 
 	// Corrupt a file in the gen 2 segment.
 	fstPath := dir.SegmentFile(r2.SegmentID, "fst.bin")
-	os.WriteFile(fstPath, []byte("corrupted!"), 0644)
+	if err := os.WriteFile(fstPath, []byte("corrupted!"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := Recover(dir, DefaultOptions())
 	if err != nil {
@@ -213,7 +225,9 @@ func TestRecover_AllCorrupt(t *testing.T) {
 
 	// Corrupt the only segment.
 	fstPath := dir.SegmentFile(r1.SegmentID, "fst.bin")
-	os.WriteFile(fstPath, []byte("corrupted!"), 0644)
+	if err := os.WriteFile(fstPath, []byte("corrupted!"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	_, err := Recover(dir, DefaultOptions())
 	if err == nil {
@@ -272,7 +286,9 @@ func TestRecover_SkipChecksumVerification(t *testing.T) {
 
 	// Corrupt a segment file.
 	fstPath := dir.SegmentFile(r.SegmentID, "fst.bin")
-	os.WriteFile(fstPath, []byte("corrupted!"), 0644)
+	if err := os.WriteFile(fstPath, []byte("corrupted!"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	// With checksum verification disabled, should succeed.
 	opts := DefaultOptions()
@@ -334,7 +350,9 @@ func TestRecover_EmptyIndex_TmpHasFiles(t *testing.T) {
 	dir := setupTestIndex(t)
 
 	// No manifest.current, but leave junk in tmp/.
-	os.WriteFile(filepath.Join(dir.TmpDir(), "leftover"), []byte("x"), 0644)
+	if err := os.WriteFile(filepath.Join(dir.TmpDir(), "leftover"), []byte("x"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	result, err := Recover(dir, DefaultOptions())
 	if err != nil {

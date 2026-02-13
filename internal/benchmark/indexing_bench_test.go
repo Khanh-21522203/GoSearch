@@ -59,7 +59,7 @@ func BenchmarkIndexing_SmallDocs(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		w := indexing.NewWriter(schema, registry)
 		for j := 0; j < 100; j++ {
-			w.AddDocument(smallDoc(j))
+			_ = w.AddDocument(smallDoc(j))
 		}
 	}
 }
@@ -72,7 +72,7 @@ func BenchmarkIndexing_LargeDocs(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		w := indexing.NewWriter(schema, registry)
 		for j := 0; j < 100; j++ {
-			w.AddDocument(largeDoc(j))
+			_ = w.AddDocument(largeDoc(j))
 		}
 	}
 }
@@ -84,7 +84,7 @@ func BenchmarkIndexing_SingleDoc(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		w.AddDocument(indexing.Document{Fields: map[string]interface{}{
+		_ = w.AddDocument(indexing.Document{Fields: map[string]interface{}{
 			"id":    fmt.Sprintf("doc-%d", i),
 			"title": "Quick brown fox jumps over the lazy dog",
 			"body":  "The five boxing wizards jump quickly at dawn.",

@@ -17,10 +17,16 @@ func TestCrashRecovery_TempFilesCleanup(t *testing.T) {
 
 		// Leave orphan files in tmp/.
 		tmpDir := idxDir.TmpDir()
-		os.MkdirAll(tmpDir, 0755)
+		if err := os.MkdirAll(tmpDir, 0755); err != nil {
+			t.Fatal(err)
+		}
 		orphanFile := filepath.Join(tmpDir, "orphan_segment")
-		os.MkdirAll(orphanFile, 0755)
-		os.WriteFile(filepath.Join(orphanFile, "data.bin"), []byte("orphan"), 0644)
+		if err := os.MkdirAll(orphanFile, 0755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(orphanFile, "data.bin"), []byte("orphan"), 0644); err != nil {
+			t.Fatal(err)
+		}
 
 		// Run recovery.
 		result, err := recovery.Recover(idxDir, recovery.DefaultOptions())
@@ -56,7 +62,9 @@ func TestCrashRecovery_CorruptManifest(t *testing.T) {
 
 		// Write a corrupt generation 2 manifest.
 		m2Path := idxDir.ManifestPath(2)
-		os.WriteFile(m2Path, []byte("corrupt data"), 0644)
+		if err := os.WriteFile(m2Path, []byte("corrupt data"), 0644); err != nil {
+			t.Fatal(err)
+		}
 		if err := index.WriteCurrentGeneration(idxDir, 2); err != nil {
 			t.Fatalf("WriteCurrentGeneration 2: %v", err)
 		}
@@ -95,11 +103,15 @@ func TestCrashRecovery_ValidCommit(t *testing.T) {
 		// Create a valid segment directory.
 		segID := "seg_gen_1_abc"
 		segDir := idxDir.SegmentDir(segID)
-		os.MkdirAll(segDir, 0755)
+		if err := os.MkdirAll(segDir, 0755); err != nil {
+			t.Fatal(err)
+		}
 
 		// Write a minimal segment file.
 		metaContent := []byte(`{"test": true}`)
-		os.WriteFile(filepath.Join(segDir, "meta.json"), metaContent, 0644)
+		if err := os.WriteFile(filepath.Join(segDir, "meta.json"), metaContent, 0644); err != nil {
+			t.Fatal(err)
+		}
 
 		// Write manifest referencing the segment.
 		checksum := storage.ComputeChecksum(metaContent)

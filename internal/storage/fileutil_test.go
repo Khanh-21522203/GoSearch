@@ -10,10 +10,18 @@ func TestRemoveDirContents(t *testing.T) {
 	dir := t.TempDir()
 
 	// Create some files and a subdirectory.
-	os.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0644)
-	os.WriteFile(filepath.Join(dir, "b.txt"), []byte("b"), 0644)
-	os.Mkdir(filepath.Join(dir, "subdir"), 0755)
-	os.WriteFile(filepath.Join(dir, "subdir", "c.txt"), []byte("c"), 0644)
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "b.txt"), []byte("b"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(dir, "subdir"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "subdir", "c.txt"), []byte("c"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	removed, err := RemoveDirContents(dir)
 	if err != nil {
@@ -59,9 +67,15 @@ func TestRemoveDirContents_EmptyDir(t *testing.T) {
 func TestListSubdirs(t *testing.T) {
 	dir := t.TempDir()
 
-	os.Mkdir(filepath.Join(dir, "dir1"), 0755)
-	os.Mkdir(filepath.Join(dir, "dir2"), 0755)
-	os.WriteFile(filepath.Join(dir, "file.txt"), []byte("f"), 0644)
+	if err := os.Mkdir(filepath.Join(dir, "dir1"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(dir, "dir2"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "file.txt"), []byte("f"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	dirs, err := ListSubdirs(dir)
 	if err != nil {
@@ -85,9 +99,15 @@ func TestListSubdirs_NotExists(t *testing.T) {
 func TestListFiles(t *testing.T) {
 	dir := t.TempDir()
 
-	os.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0644)
-	os.WriteFile(filepath.Join(dir, "b.json"), []byte("b"), 0644)
-	os.Mkdir(filepath.Join(dir, "subdir"), 0755)
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("a"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "b.json"), []byte("b"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(filepath.Join(dir, "subdir"), 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	files, err := ListFiles(dir)
 	if err != nil {
@@ -111,7 +131,9 @@ func TestListFiles_NotExists(t *testing.T) {
 func TestFileExists(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "exists.txt")
-	os.WriteFile(path, []byte("x"), 0644)
+	if err := os.WriteFile(path, []byte("x"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	if !FileExists(path) {
 		t.Error("FileExists should return true for existing file")
@@ -127,7 +149,9 @@ func TestFileExists(t *testing.T) {
 func TestDirExists(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "file.txt")
-	os.WriteFile(path, []byte("x"), 0644)
+	if err := os.WriteFile(path, []byte("x"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	if !DirExists(dir) {
 		t.Error("DirExists should return true for existing directory")

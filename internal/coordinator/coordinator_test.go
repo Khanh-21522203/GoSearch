@@ -356,5 +356,5 @@ func TestQueryPlan_HasPlanID(t *testing.T) {
 		},
 	}
 	c := newTestCoordinator(clients)
-	c.Search(context.Background(), QueryClause{Type: "term"}, QueryOptions{TopK: 10})
+	_, _ = c.Search(context.Background(), QueryClause{Type: "term"}, QueryOptions{TopK: 10})
 }
